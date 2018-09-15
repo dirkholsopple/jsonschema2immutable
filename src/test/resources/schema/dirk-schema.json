@@ -1,0 +1,46 @@
+{
+  "description": "Test schema",
+  "type": "object",
+  "properties": {
+    "firstName": { "type": "string", "required": true },
+    "lastName": { "type": "string", "default": "Last name" },
+    "num": { "type": "number", "default": 42 },
+    "requiredNum": { "type": "number", "required": true },
+    "homeAddress": { "$ref": "./address.json", "description": "A home address" },
+    "workAddress": { "description": "A work address", "required": true, "$ref": "./address.json" },
+    "people": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "emailAddress": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 80
+          }
+        }
+      }
+    },
+    "enumField": {
+      "type": "string",
+      "enum": ["A", "B", "C", "D"],
+      "default": "C"
+    },
+    "enumField2": {
+      "$ref": "./enum.json",
+      "default": "two"
+    },
+    "uuidField": {
+      "type": "string",
+      "format": "uuid",
+      "default": "00000000-0000-0000-0000-000000000000"
+    },
+    "uuidField2": {
+      "type": "string",
+      "javaType": "java.util.UUID"
+    }
+  }
+}
