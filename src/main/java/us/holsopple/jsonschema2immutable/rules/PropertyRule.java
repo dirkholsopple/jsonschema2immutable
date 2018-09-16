@@ -26,12 +26,17 @@ public class PropertyRule implements Rule<JDefinedClass, JDefinedClass> {
             propertyType = propertyType.boxify();
         }
 
-        JMethod getter = addGetter(cls, propertyType, nodeName, originalNode, node, isRequired);
+        JExpression defaultExpression = getDefaultExpr(originalNode, node, cls, propertyType);
+        JMethod getter = addGetter(cls, propertyType, nodeName, originalNode, node, isRequired, defaultExpression);
         ruleFactory.getAnnotator().propertyGetter(getter, cls, nodeName);
         propertyAnnotations(nodeName, node, originalNode, schema, getter);
 
-        addDefault(originalNode, node, cls, getter);
-/*
+        if (defaultExpression != null) {
+            getter.annotate(Value.Default.class);
+            getter.body()._return(defaultExpression);
+        }
+
+        /*
         ruleFactory.getMinimumMaximumRule().apply(nodeName, node, null, schema);
 
         ruleFactory.getMinItemsMaxItemsRule().apply(nodeName, node, null, schema);
@@ -91,13 +96,12 @@ public class PropertyRule implements Rule<JDefinedClass, JDefinedClass> {
     }
 
     private JMethod addGetter(JDefinedClass c, JType type, String jsonPropertyName, JsonNode originalNode,
-                              JsonNode node, boolean isRequired) {
-        JMethod getter = c.method(JMod.PUBLIC, type, getGetterName(jsonPropertyName, type, node));
-        if (!isRequired && getOriginalOrRefProperty(originalNode, node, "default") == null &&
-            !"array".equals(node.get("type").asText())) {
+                              JsonNode node, boolean isRequired, JExpression defaultValue) {
+        int mods = defaultValue == null ? (JMod.PUBLIC | JMod.ABSTRACT) : JMod.PUBLIC;
+        JMethod getter = c.method(mods, type, getGetterName(jsonPropertyName, type, node));
+        if (!isRequired && defaultValue == null && !"array".equals(node.get("type").asText())) {
             getter.annotate(Nullable.class);
         }
-        getter.params();
         return getter;
     }
 
@@ -116,19 +120,10 @@ public class PropertyRule implements Rule<JDefinedClass, JDefinedClass> {
         }
     }
 
-    private boolean isObject(JsonNode node) {
-        return node.path("type").asText().equals("object");
-    }
-
-    private boolean isArray(JsonNode node) {
-        return node.path("type").asText().equals("array");
-    }
-
-    private JExpression getDefaultExpr(JsonNode originalNode, JsonNode node, JClass cls, JMethod method) {
+    private JExpression getDefaultExpr(JsonNode originalNode, JsonNode node, JClass cls, JType type) {
         JsonNode defaultNode = getOriginalOrRefProperty(originalNode, node, "default");
 
         JCodeModel codeModel = cls.owner();
-        JType type = method.type();
         if (defaultNode != null) {
             if (type.unboxify() == codeModel.BOOLEAN) {
                 return JExpr.lit(defaultNode.asBoolean());
@@ -153,18 +148,5 @@ public class PropertyRule implements Rule<JDefinedClass, JDefinedClass> {
             }
         }
         return null;
-    }
-
-    private void addDefault(JsonNode originalNode, JsonNode node, JClass cls, JMethod method) {
-        JsonNode defaultNode = getOriginalOrRefProperty(originalNode, node, "default");
-
-        JCodeModel codeModel = cls.owner();
-        JType type = method.type();
-        JExpression defaultExpression = getDefaultExpr(originalNode, node, cls, method);
-        if (defaultExpression != null) {
-            method.annotate(Value.Default.class);
-            method.body()._return(defaultExpression);
-            // TODO add default keyword
-        }
     }
 }

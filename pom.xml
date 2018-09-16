@@ -17,6 +17,29 @@
                     <target>8</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>jarjar-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jarjar</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>com.helger:jcodemodel</include>
+                            </includes>
+                            <rules>
+                                <rule>
+                                    <pattern>com.helger.jcodemodel.**</pattern>
+                                    <result>com.sun.codemodel.@1</result>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -47,6 +70,11 @@
             <groupId>com.helger</groupId>
             <artifactId>jcodemodel</artifactId>
             <version>3.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>jarjar-maven-plugin</artifactId>
+            <version>RELEASE</version>
         </dependency>
     </dependencies>
 </project>

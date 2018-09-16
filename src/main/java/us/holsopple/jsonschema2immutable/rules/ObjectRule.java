@@ -129,7 +129,6 @@ public class ObjectRule implements Rule<JPackage, JType> {
                 throw new ClassAlreadyExistsException(existingClass);
             }
 
-            boolean usePolymorphicDeserialization = usesPolymorphicDeserialization(node);
             if (node.has("javaType")) {
                 String fqn = node.path("javaType").asText();
 
@@ -146,17 +145,9 @@ public class ObjectRule implements Rule<JPackage, JType> {
                     fqn = fqn.substring(0, index) + ruleFactory.getGenerationConfig().getClassNamePrefix() + fqn.substring(index) + ruleFactory.getGenerationConfig().getClassNameSuffix();
                 }
 
-                if (usePolymorphicDeserialization) {
-                    newType = _package.owner()._class(JMod.PUBLIC, fqn, ClassType.INTERFACE);
-                } else {
-                    newType = _package.owner()._class(fqn, ClassType.INTERFACE);
-                }
+                newType = _package.owner()._class(JMod.PUBLIC | JMod.ABSTRACT, fqn, ClassType.CLASS);
             } else {
-                if (usePolymorphicDeserialization) {
-                    newType = _package._class(JMod.PUBLIC, getClassName(nodeName, node, _package), ClassType.INTERFACE);
-                } else {
-                    newType = _package._class(JMod.PUBLIC, getClassName(nodeName, node, _package), ClassType.INTERFACE);
-                }
+                newType = _package._class(JMod.PUBLIC | JMod.ABSTRACT, getClassName(nodeName, node, _package), ClassType.CLASS);
             }
         } catch (JClassAlreadyExistsException e) {
             throw new ClassAlreadyExistsException(e.getExistingClass());
