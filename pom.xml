@@ -76,5 +76,10 @@
             <artifactId>jarjar-maven-plugin</artifactId>
             <version>RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>net.sourceforge.argparse4j</groupId>
+            <artifactId>argparse4j</artifactId>
+            <version>0.8.1</version>
+        </dependency>
     </dependencies>
 </project>
