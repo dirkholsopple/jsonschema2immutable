@@ -1,9 +1,6 @@
 package us.holsopple.jsonschema2immutable.rules;
 
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JDocCommentable;
-import com.sun.codemodel.JPackage;
-import com.sun.codemodel.JType;
+import com.sun.codemodel.*;
 import org.jsonschema2pojo.*;
 import org.jsonschema2pojo.rules.Rule;
 import org.jsonschema2pojo.rules.RuleFactory;
@@ -318,5 +315,10 @@ public class ImmutableRuleFactory extends RuleFactory {
     @Override
     public Rule<JDocCommentable, JDocCommentable> getRequiredRule() {
         return new RequiredRule();
+    }
+
+    @Override
+    public Rule<JClassContainer, JType> getEnumRule() {
+        return new EnumRule(this);
     }
 }
