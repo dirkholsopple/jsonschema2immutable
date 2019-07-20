@@ -33,6 +33,9 @@
       "$ref": "./enum.json",
       "default": "two"
     },
+    "enumField3": {
+      "$ref": "./enum2.json"
+    },
     "uuidField": {
       "type": "string",
       "format": "uuid",

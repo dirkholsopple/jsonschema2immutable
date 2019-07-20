@@ -99,7 +99,8 @@ public class PropertyRule implements Rule<JDefinedClass, JDefinedClass> {
                               JsonNode node, boolean isRequired, JExpression defaultValue) {
         int mods = defaultValue == null ? (JMod.PUBLIC | JMod.ABSTRACT) : JMod.PUBLIC;
         JMethod getter = c.method(mods, type, getGetterName(jsonPropertyName, type, node));
-        if (!isRequired && defaultValue == null && !"array".equals(node.get("type").asText())) {
+        String nodeType = node.get("type") != null ? node.get("type").asText() : null;
+        if (!isRequired && defaultValue == null && !"array".equals(nodeType)) {
             getter.annotate(Nullable.class);
         }
         return getter;
